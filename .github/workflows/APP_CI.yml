@@ -101,3 +101,13 @@ jobs:
       - name: List packages
         run: ls -R ./dist
         shell: bash
+      - name: Setup ossutil
+        uses: yizhoumo/setup-ossutil@v1
+        with:
+          endpoint: "oss-cn-shanghai.aliyuncs.com"
+          access-key-id: ${{ secrets.OSS_ACCESS_KEY }}
+          access-key-secret: ${{ secrets.OSS_SECRET_KEY }}
+      - name: Upload to Oss
+        shell: bash
+        run: |
+          ossutil cp -r ./dist/ oss://lwt-sh/lwt-app/`date -u +%Y%m%d%H%M%S`-${GITHUB_SHA}/
