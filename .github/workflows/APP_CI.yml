@@ -84,7 +84,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: app-${{ matrix.settings.target }}
+          name: app
           path: out/make/**/lwt-app*
           if-no-files-found: error
   publish:
@@ -96,6 +96,7 @@ jobs:
       - name: Download all artifacts
         uses: actions/download-artifact@v3
         with:
+          name: app
           path: dist
       - name: List packages
         run: ls -R ./dist
