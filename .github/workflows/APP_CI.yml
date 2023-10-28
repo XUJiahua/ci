@@ -75,7 +75,7 @@ jobs:
       - name: Download all artifacts
         uses: actions/download-artifact@v3
         with:
-          path: dist
+          name: dist
       - name: Install dependencies
         run: yarn install
       - name: Build
