@@ -38,7 +38,7 @@ jobs:
           - host: windows-latest
             build: yarn build
             target: x86_64-pc-windows-msvc
-          - host: macos-latest
+          - host: macos-14
             target: aarch64-apple-darwin
             build: |
               uname -a
