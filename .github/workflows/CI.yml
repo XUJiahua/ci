@@ -17,18 +17,20 @@ jobs:
         with:
           repository: lwtlab/lwt-core
           token: ${{ secrets.GH_PAT }}
-      - name: Setup variable REPO_REF and REPO_TAG
+      - name: Setup variable REPO_REF (for checking out code), REPO_SHA (short SHA for display) and REPO_TAG (for display)
         # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#example-of-writing-an-environment-variable-to-github_env
         run: |
           if [ -z "${{ github.event.client_payload.ref }}" ]; then
-            echo "REPO_REF=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+            echo "REPO_REF=$(git rev-parse HEAD)" >> $GITHUB_ENV
+            echo "REPO_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
             echo "REPO_TAG=" >> $GITHUB_ENV
           else
             echo "REPO_REF=${{ github.event.client_payload.ref }}" >> $GITHUB_ENV
+            echo "REPO_SHA=${{ github.event.client_payload.sha }}" >> $GITHUB_ENV
             echo "REPO_TAG=${{ github.event.client_payload.tag }}" >> $GITHUB_ENV
           fi
-      - name: DEBUG variable REPO_REF and REPO_TAG
-        run: echo "$REPO_REF, $REPO_TAG"
+      - name: DEBUG variable REPO_REF, REPO_SHA and REPO_TAG
+        run: echo "$REPO_REF, $REPO_SHA, $REPO_TAG"
   build:
     defaults:
       run:
@@ -180,4 +182,8 @@ jobs:
       - name: Upload to Oss
         shell: bash
         run: |
-          ossutil cp -r dist/* oss://lwt-dev/lwt-core/lwt-core-electron/`date -u +%Y%m%d%H%M%S`-${GITHUB_SHA}/
+          if [ -z "${REPO_TAG}" ]; then
+            ossutil cp -r dist/* oss://lwt-dev/lwt-core/lwt-core-electron/`date -u +%Y%m%d%H%M%S`-${REPO_SHA}/
+          else
+            ossutil cp -r dist/* oss://lwt-dev/lwt-core/lwt-core-electron/${REPO_TAG}/
+          fi
