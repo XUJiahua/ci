@@ -156,4 +156,4 @@ jobs:
       - name: Upload to Oss
         shell: bash
         run: |
-          ossutil cp *.tgz oss://lwt-dev/lwt-core/lwt-core-electron/`date -u +%Y%m%d%H%M%S`-${GITHUB_SHA}/
+          ossutil cp -r dist/* oss://lwt-dev/lwt-core/lwt-core-electron/`date -u +%Y%m%d%H%M%S`-${GITHUB_SHA}/
