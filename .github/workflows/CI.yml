@@ -62,7 +62,7 @@ jobs:
           repository: lwtlab/lwt-core
           token: ${{ secrets.GH_PAT }}
           submodules: true
-          ref: ${{ REPO_REF }}
+          ref: ${{ env.REPO_REF }}
       - name: Pull & update submodules recursively
         run: |
           git submodule update --init --recursive
@@ -150,7 +150,7 @@ jobs:
           repository: lwtlab/lwt-core
           token: ${{ secrets.GH_PAT }}
           submodules: true
-          ref: ${{ REPO_REF }}
+          ref: ${{ env.REPO_REF }}
       - name: Setup node
         uses: actions/setup-node@v3
         with:
