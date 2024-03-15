@@ -1,4 +1,4 @@
-name: build_lwt_app
+name: build_lwt_app_manually
 on:
   workflow_dispatch:
 jobs:
