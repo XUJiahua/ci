@@ -1,0 +1,114 @@
+name: build_lwt_app
+permissions:
+  contents: write
+  id-token: write
+on:
+  repository_dispatch:
+    types: [build_lwt_app]
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: DEBUG variables from github.event.client_payload
+        run: |
+          echo "tag: ${{ github.event.client_payload.tag }}"
+          echo "sha: ${{ github.event.client_payload.sha }}"
+          echo "ref: ${{ github.event.client_payload.ref }}"
+  dist_build:
+    defaults:
+      run:
+        working-directory: lwt-reader
+    name: Build Frontend dist
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: lwtlab/lwt-server
+          token: ${{ secrets.GH_PAT }}
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          check-latest: true
+          cache: npm
+          cache-dependency-path: ./lwt-reader/package-lock.json
+          registry-url: https://npm.pkg.github.com/
+      - name: Install dependencies
+        run: npm i
+      - name: Build dist
+        run: npm run build
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: lwt-reader/dist/
+          if-no-files-found: error
+  build:
+    needs:
+      - dist_build
+    name: Build App
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: lwtlab/lwt-app
+          token: ${{ secrets.GH_PAT }}
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          check-latest: true
+          cache: yarn
+          cache-dependency-path: ./yarn.lock
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
+          path: dist
+      - name: Setup ossutil
+        uses: yizhoumo/setup-ossutil@v1
+        with:
+          endpoint: "oss-cn-shanghai.aliyuncs.com"
+          access-key-id: ${{ secrets.OSS_ACCESS_KEY }}
+          access-key-secret: ${{ secrets.OSS_SECRET_KEY }}
+      - name: Install core dependencies
+        run: |
+          bash core_download.sh
+          bash core_install.sh
+        shell: bash
+      - name: Install rest dependencies
+        run: yarn install
+      - name: Build
+        run: |
+          bash build.sh
+        shell: bash
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: app
+          path: out/make/**/lwt-app*
+          if-no-files-found: error
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: app
+          path: dist
+      - name: List packages
+        run: ls -R ./dist
+        shell: bash
+      - name: Setup ossutil
+        uses: yizhoumo/setup-ossutil@v1
+        with:
+          endpoint: "oss-cn-shanghai.aliyuncs.com"
+          access-key-id: ${{ secrets.OSS_ACCESS_KEY }}
+          access-key-secret: ${{ secrets.OSS_SECRET_KEY }}
+      - name: Upload to Oss
+        shell: bash
+        run: |
+          ossutil cp -r dist/ oss://lwt-dev/lwt-app/`date -u +%Y%m%d%H%M%S`-${{ github.event.client_payload.sha }}/
