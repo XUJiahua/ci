@@ -1,0 +1,13 @@
+name: debug_repository_dispatch
+on:
+  repository_dispatch:
+    types: [debug]
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: DEBUG variables from github.event.client_payload
+        run: |
+          echo "tag: ${{ github.event.client_payload.tag }}"
+          echo "sha: ${{ github.event.client_payload.sha }}"
+          echo "ref: ${{ github.event.client_payload.ref }}"

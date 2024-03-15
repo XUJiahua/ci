@@ -22,5 +22,6 @@ jobs:
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.GH_PAT }}
-          event-type: build_electron_npm
-          client-payload: '{"ref": "$REPO_REF", "sha": "$REPO_SHA", "tag": "$REPO_TAG"}'
+          event-type: debug
+          # event-type: build_electron_npm
+          client-payload: '{"ref": "${{ env.REPO_REF }}", "sha": "${{ env.REPO_SHA }}", "tag": "${{ env.REPO_TAG }}"}'
