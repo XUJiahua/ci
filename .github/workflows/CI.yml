@@ -9,6 +9,26 @@ permissions:
 on:
   workflow_dispatch:
 jobs:
+  get-repo-ref:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code for getting latest commit
+        uses: actions/checkout@v4
+        with:
+          repository: lwtlab/lwt-core
+          token: ${{ secrets.GH_PAT }}
+      - name: Setup variable REPO_REF and REPO_TAG
+        # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#example-of-writing-an-environment-variable-to-github_env
+        run: |
+          if [ -z "${{ github.event.client_payload.ref }}" ]; then
+            echo "REPO_REF=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+            echo "REPO_TAG=" >> $GITHUB_ENV
+          else
+            echo "REPO_REF=${{ github.event.client_payload.ref }}" >> $GITHUB_ENV
+            echo "REPO_TAG=${{ github.event.client_payload.tag }}" >> $GITHUB_ENV
+          fi
+      - name: DEBUG variable REPO_REF and REPO_TAG
+        run: echo "$REPO_REF, $REPO_TAG"
   build:
     defaults:
       run:
@@ -32,12 +52,15 @@ jobs:
               strip -x *.node
     name: stable - ${{ matrix.settings.target }} - node@18
     runs-on: ${{ matrix.settings.host }}
+    needs:
+      - get-repo-ref
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           repository: lwtlab/lwt-core
           token: ${{ secrets.GH_PAT }}
           submodules: true
+          ref: ${REPO_REF}
       - name: Pull & update submodules recursively
         run: |
           git submodule update --init --recursive
@@ -120,11 +143,12 @@ jobs:
     needs:
       - build
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           repository: lwtlab/lwt-core
           token: ${{ secrets.GH_PAT }}
           submodules: true
+          ref: ${REPO_REF}
       - name: Setup node
         uses: actions/setup-node@v3
         with:
