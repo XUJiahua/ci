@@ -78,7 +78,7 @@ jobs:
           bash core_install.sh
         shell: bash
       - name: Install rest dependencies
-        run: yarn install
+        run: yarn install --ignore-platform
       - name: Build
         run: |
           bash build.sh
