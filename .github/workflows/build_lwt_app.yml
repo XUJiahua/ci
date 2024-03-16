@@ -66,22 +66,25 @@ jobs:
         with:
           name: dist
           path: dist
+      - name: Install Wine on MacOS for Windows build
+        run: brew install --cask wine-stable
+        shell: bash
       - name: Setup ossutil
         uses: yizhoumo/setup-ossutil@v1
         with:
           endpoint: "oss-cn-shanghai.aliyuncs.com"
           access-key-id: ${{ secrets.OSS_ACCESS_KEY }}
           access-key-secret: ${{ secrets.OSS_SECRET_KEY }}
+      - name: Install dependencies
+        run: yarn install
       - name: Install core dependencies
         run: |
-          bash core_download.sh
-          bash core_install.sh
+          bash ci/core_download.sh
+          bash ci/core_install.sh
         shell: bash
-      - name: Install rest dependencies
-        run: yarn install --ignore-platform
       - name: Build
         run: |
-          bash build.sh
+          bash ci/build.sh
         shell: bash
       - name: Upload artifact
         uses: actions/upload-artifact@v3
