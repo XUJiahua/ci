@@ -1,0 +1,27 @@
+name: build_hear_npm_manually
+on:
+  workflow_dispatch:
+jobs:
+  prepare-and-dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code for getting latest commit
+        uses: actions/checkout@v4
+        with:
+          repository: lwtlab/lwt-core
+          token: ${{ secrets.GH_PAT }}
+      - name: Setup variable REPO_REF (for checking out code), REPO_SHA (short SHA for display) and REPO_TAG (for display)
+        # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#example-of-writing-an-environment-variable-to-github_env
+        run: |
+          echo "REPO_REF=$(git rev-parse HEAD)" >> $GITHUB_ENV
+          echo "REPO_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "REPO_TAG=" >> $GITHUB_ENV
+      - name: DEBUG variable REPO_REF, REPO_SHA and REPO_TAG
+        run: echo "$REPO_REF, $REPO_SHA, $REPO_TAG"
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.GH_PAT }}
+          # event-type: debug
+          event-type: build_hear_npm
+          client-payload: '{"ref": "${{ env.REPO_REF }}", "sha": "${{ env.REPO_SHA }}", "tag": "${{ env.REPO_TAG }}"}'
