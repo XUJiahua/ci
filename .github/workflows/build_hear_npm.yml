@@ -55,10 +55,10 @@ jobs:
           git submodule update --init --recursive
           git submodule update --recursive --remote
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         if: ${{ !matrix.settings.docker }}
         with:
-          node-version: 18
+          node-version: 20
           check-latest: true
           cache: yarn
           cache-dependency-path: ./hear-core/yarn.lock
@@ -74,7 +74,7 @@ jobs:
           toolchain: stable
           targets: ${{ matrix.settings.target }}
       - name: Cache cargo
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry/index/
@@ -98,10 +98,10 @@ jobs:
       - name: Install dependencies
         run: yarn install
       - name: Setup node x86
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         if: matrix.settings.target == 'i686-pc-windows-msvc'
         with:
-          node-version: 18
+          node-version: 20
           check-latest: true
           cache: yarn
           cache-dependency-path: ./hear-core/yarn.lock
@@ -118,7 +118,7 @@ jobs:
         if: ${{ !matrix.settings.docker }}
         shell: bash
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: bindings-${{ matrix.settings.target }}
           path: hear-core/${{ env.APP_NAME }}.*.node
@@ -139,9 +139,9 @@ jobs:
           submodules: true
           ref: ${{ github.event.client_payload.ref }}
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           check-latest: true
           cache: yarn
           cache-dependency-path: ./hear-core/yarn.lock
@@ -149,7 +149,7 @@ jobs:
       - name: Install dependencies
         run: yarn install
       - name: Download all artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: hear-core/artifacts
       - name: Move artifacts
