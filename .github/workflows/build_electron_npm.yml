@@ -32,9 +32,6 @@ jobs:
               uname -a
               sw_vers
               yarn build
-              # fixme: EXC_CRASH (SIGABRT)
-              # strip matters?
-              # strip -x *.node
           - host: windows-latest
             build: yarn build
             target: x86_64-pc-windows-msvc
@@ -44,7 +41,6 @@ jobs:
               uname -a
               sw_vers
               yarn build --target aarch64-apple-darwin
-              # strip -x *.node
     name: stable - ${{ matrix.settings.target }} - node@18
     runs-on: ${{ matrix.settings.host }}
     steps:
