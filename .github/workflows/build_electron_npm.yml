@@ -21,7 +21,7 @@ jobs:
   build:
     defaults:
       run:
-        working-directory: lwt-core-electron
+        working-directory: ${{ env.APP_NAME }}
     strategy:
       fail-fast: false
       matrix:
@@ -40,7 +40,7 @@ jobs:
             build: |
               uname -a
               sw_vers
-              yarn build --target aarch64-apple-darwin
+              yarn build
     name: stable - ${{ matrix.settings.target }} - node@18
     runs-on: ${{ matrix.settings.host }}
     steps:
@@ -55,16 +55,16 @@ jobs:
           git submodule update --init --recursive
           git submodule update --recursive --remote
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         if: ${{ !matrix.settings.docker }}
         with:
-          node-version: 18
+          node-version: 20
           check-latest: true
           cache: yarn
-          cache-dependency-path: ./lwt-core-electron/yarn.lock
+          cache-dependency-path: ./${{ env.APP_NAME }}/yarn.lock
       # required for deno
       - name: Install Protoc
-        uses: arduino/setup-protoc@v2
+        uses: arduino/setup-protoc@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Install
@@ -74,7 +74,7 @@ jobs:
           toolchain: stable
           targets: ${{ matrix.settings.target }}
       - name: Cache cargo
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry/index/
@@ -98,35 +98,35 @@ jobs:
       - name: Install dependencies
         run: yarn install
       - name: Setup node x86
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         if: matrix.settings.target == 'i686-pc-windows-msvc'
         with:
-          node-version: 18
+          node-version: 20
           check-latest: true
           cache: yarn
-          cache-dependency-path: ./lwt-core-electron/yarn.lock
+          cache-dependency-path: ./${{ env.APP_NAME }}/yarn.lock
           architecture: x86
       - name: Build in docker
         uses: addnab/docker-run-action@v3
         if: ${{ matrix.settings.docker }}
         with:
           image: ${{ matrix.settings.docker }}
-          options: "--user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build/lwt-core-electron"
+          options: "--user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build/${{ env.APP_NAME }}"
           run: ${{ matrix.settings.build }}
       - name: Build
         run: ${{ matrix.settings.build }}
         if: ${{ !matrix.settings.docker }}
         shell: bash
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: bindings-${{ matrix.settings.target }}
-          path: lwt-core-electron/${{ env.APP_NAME }}.*.node
+          path: ${{ env.APP_NAME }}/${{ env.APP_NAME }}.*.node
           if-no-files-found: error
   publish:
     defaults:
       run:
-        working-directory: lwt-core-electron
+        working-directory: ${{ env.APP_NAME }}
     name: Publish
     runs-on: ubuntu-latest
     needs:
@@ -139,19 +139,19 @@ jobs:
           submodules: true
           ref: ${{ github.event.client_payload.ref }}
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           check-latest: true
           cache: yarn
-          cache-dependency-path: ./lwt-core-electron/yarn.lock
+          cache-dependency-path: ./${{ env.APP_NAME }}/yarn.lock
           registry-url: https://npm.pkg.github.com/
       - name: Install dependencies
         run: yarn install
       - name: Download all artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          path: lwt-core-electron/artifacts
+          path: ${{ env.APP_NAME }}/artifacts
       - name: Move artifacts
         run: yarn artifacts
       - name: List packages
@@ -170,7 +170,7 @@ jobs:
         shell: bash
         run: |
           if [ -z "${{ github.event.client_payload.tag }}" ]; then
-            ossutil cp -r dist/ oss://lwt-dev/lwt-core/lwt-core-electron/`date -u +%Y%m%d%H%M%S`-${{ github.event.client_payload.sha }}/
+            ossutil cp -r dist/ oss://lwt-dev/lwt-core/${{ env.APP_NAME }}/`date -u +%Y%m%d%H%M%S`-${{ github.event.client_payload.sha }}/
           else
-            ossutil cp -r dist/ oss://lwt-dev/lwt-core/lwt-core-electron/${{ github.event.client_payload.tag }}/
+            ossutil cp -r dist/ oss://lwt-dev/lwt-core/${{ env.APP_NAME }}/${{ github.event.client_payload.tag }}/
           fi
