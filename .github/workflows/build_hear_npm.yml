@@ -36,7 +36,7 @@ jobs:
           - host: windows-latest
             build: yarn build
             target: x86_64-pc-windows-msvc
-            cuda-toolkit: 12.3.2
+            cuda-toolkit: '12.3.2'
           - host: macos-14
             target: aarch64-apple-darwin
             build: |
@@ -74,7 +74,7 @@ jobs:
         id: cuda-toolkit
         uses: Jimver/cuda-toolkit@v0.2.11
         with:
-          cuda: '${{ matrix.settings.cuda-toolkit }}'      
+          cuda: ${{ matrix.settings.cuda-toolkit }}
       - name: Install
         uses: dtolnay/rust-toolchain@stable
         if: ${{ !matrix.settings.docker }}
