@@ -35,6 +35,9 @@ jobs:
           - host: windows-latest
             build: yarn build
             target: x86_64-pc-windows-msvc
+            cuda-toolkit: '12.2.0'
+            # fixme: Got no files in tool cahce
+            # cuda-toolkit: '12.3.2'
           - host: macos-14
             target: aarch64-apple-darwin
             build: |
@@ -67,6 +70,14 @@ jobs:
         uses: arduino/setup-protoc@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install CUDA Toolkit on Windows
+        if: ${{ matrix.settings.target == 'x86_64-pc-windows-msvc' }}
+        id: cuda-toolkit
+        # fixme: Got no files in tool cahce
+        # uses: Jimver/cuda-toolkit@v0.2.14
+        uses: Jimver/cuda-toolkit@v0.2.11
+        with:
+          cuda: ${{ matrix.settings.cuda-toolkit }}
       - name: Install
         uses: dtolnay/rust-toolchain@stable
         if: ${{ !matrix.settings.docker }}
