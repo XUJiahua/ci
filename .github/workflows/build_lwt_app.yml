@@ -82,6 +82,11 @@ jobs:
           bash ci/core_download.sh
           bash ci/core_install.sh
         shell: bash
+      - name: Install cuda dll
+        run: |
+          bash ci/cuda_download.sh
+          bash ci/cuda_install.sh
+        shell: bash
       - name: Build
         run: |
           bash ci/build.sh
