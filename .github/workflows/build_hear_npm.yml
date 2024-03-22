@@ -74,7 +74,9 @@ jobs:
       - name: Install CUDA Toolkit on Windows
         if: ${{ matrix.settings.target == 'x86_64-pc-windows-msvc' }}
         id: cuda-toolkit
-        uses: Jimver/cuda-toolkit@v0.2.14
+        # fixme: Got no files in tool cahce
+        # uses: Jimver/cuda-toolkit@v0.2.14
+        uses: Jimver/cuda-toolkit@v0.2.11
         with:
           cuda: ${{ matrix.settings.cuda-toolkit }}
       - name: Install
