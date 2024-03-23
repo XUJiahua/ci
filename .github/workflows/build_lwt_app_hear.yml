@@ -60,7 +60,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: app
-          path: out/make/**/${{ env.APP_NAME }}*
+          path: out/prod/make/**/AI字幕*
           if-no-files-found: error
   publish:
     name: Publish
