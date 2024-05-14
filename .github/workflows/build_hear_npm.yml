@@ -33,10 +33,10 @@ jobs:
               uname -a
               sw_vers
               yarn build
-          - host: windows-latest
-            build: yarn build
-            target: x86_64-pc-windows-msvc
-            cuda-toolkit: '12.2.0'
+          # - host: windows-latest
+          #   build: yarn build
+          #   target: x86_64-pc-windows-msvc
+          #   cuda-toolkit: '12.2.0'
             # fixme: Got no files in tool cahce
             # cuda-toolkit: '12.3.2'
           - host: macos-14
