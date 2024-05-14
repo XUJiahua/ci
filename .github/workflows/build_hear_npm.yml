@@ -27,12 +27,13 @@ jobs:
       fail-fast: false
       matrix:
         settings:
-          - host: macos-latest
-            target: x86_64-apple-darwin
-            build: |
-              uname -a
-              sw_vers
-              yarn build
+          # fixme: got hear-core.darwin-arm64.node, expect x86
+          # - host: macos-latest
+          #   target: x86_64-apple-darwin
+          #   build: |
+          #     uname -a
+          #     sw_vers
+          #     yarn build
           # - host: windows-latest
           #   build: yarn build
           #   target: x86_64-pc-windows-msvc
