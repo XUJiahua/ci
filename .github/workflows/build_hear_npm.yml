@@ -70,12 +70,12 @@ jobs:
         uses: arduino/setup-protoc@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Install CUDA Toolkit on Windows
-        if: ${{ matrix.settings.target == 'x86_64-pc-windows-msvc' }}
-        id: cuda-toolkit
-        uses: Jimver/cuda-toolkit@v0.2.16
-        with:
-          cuda: ${{ matrix.settings.cuda-toolkit }}
+      # - name: Install CUDA Toolkit on Windows
+      #   if: ${{ matrix.settings.target == 'x86_64-pc-windows-msvc' }}
+      #   id: cuda-toolkit
+      #   uses: Jimver/cuda-toolkit@v0.2.16
+      #   with:
+      #     cuda: ${{ matrix.settings.cuda-toolkit }}
       - name: Install
         uses: dtolnay/rust-toolchain@stable
         if: ${{ !matrix.settings.docker }}
