@@ -37,7 +37,10 @@ jobs:
           - host: windows-latest
             build: yarn build --features cuda
             target: x86_64-pc-windows-msvc
-            cuda-toolkit: '11.3.0'
+            # fixme: CMake Error at C:/Program Files/CMake/share/cmake-3.30/Modules/CMakeDetermineCompilerId.cmake:587 (message):
+            # No CUDA toolset found.
+            # cuda-toolkit: '11.3.0'
+            cuda-toolkit: '11.8.0'
           - host: macos-14
             target: aarch64-apple-darwin
             build: |
