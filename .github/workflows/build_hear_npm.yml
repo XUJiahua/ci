@@ -35,15 +35,15 @@ jobs:
           #     sw_vers
           #     yarn build
           - host: windows-latest
-            build: yarn build
+            build: yarn build --features cuda
             target: x86_64-pc-windows-msvc
-            cuda-toolkit: '12.5.0'
+            cuda-toolkit: '11.3.0'
           - host: macos-14
             target: aarch64-apple-darwin
             build: |
               uname -a
               sw_vers
-              yarn build
+              yarn build --features metal
     name: stable - ${{ matrix.settings.target }} - node@18
     runs-on: ${{ matrix.settings.host }}
     steps:
