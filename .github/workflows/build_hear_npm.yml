@@ -27,13 +27,13 @@ jobs:
       fail-fast: false
       matrix:
         settings:
-          # fixme: got hear-core.darwin-arm64.node, expect x86
-          # - host: macos-latest
-          #   target: x86_64-apple-darwin
-          #   build: |
-          #     uname -a
-          #     sw_vers
-          #     yarn build
+          # x86 macos: https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources
+          - host: macos-12
+            target: x86_64-apple-darwin
+            build: |
+              uname -a
+              sw_vers
+              yarn build
           # fix: C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\include\crt/host_config.h(153): fatal error C1189: #error:  -- unsupported Microsoft Visual Studio version! Only the versions between 2017 and 2022 (inclusive) are supported!
           # ref: https://github.com/ggerganov/whisper.cpp/commit/c55964c956d02fc7449b3d928d9a8e093cd475c3
           - host: windows-2019
