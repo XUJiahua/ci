@@ -140,9 +140,9 @@ jobs:
         run: ${{ matrix.settings.build }}
         if: ${{ !matrix.settings.docker }}
         shell: bash
-      - name: Rename node addon on Windows for CUDA and ROCm
+      - name: Rename node addon on Windows for CUDA
         if: ${{ matrix.settings.cuda-toolkit != '' && matrix.settings.cuda-toolkit != null }}
-        run: mv hear-core.win32-x64-msvc.node hear-core.win32-x64-msvc.nodev
+        run: mv hear-core.win32-x64-msvc.node hear-core.win32-x64-msvc.node.cuda
         shell: bash
       - name: Upload artifact
         uses: actions/upload-artifact@v4
