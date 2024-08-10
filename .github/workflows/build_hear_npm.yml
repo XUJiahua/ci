@@ -41,10 +41,9 @@ jobs:
             name: windows_x86_64_cuda
             build: yarn build --features cuda
             target: x86_64-pc-windows-msvc
+            cuda-toolkit: "11.8.0"
             # fixme: fatal error LNK1181: cannot open input file 'cublas.lib'
-
             # cuda-toolkit: '11.3.0'
-            cuda-toolkit: '11.8.0'
           - host: windows
             name: windows_x86_64_cpu
             build: yarn build
@@ -93,7 +92,7 @@ jobs:
         if: ${{ !matrix.settings.docker }}
         with:
           # 1.80.0 has issue with time-rs
-          # toolchain: stable 
+          # toolchain: stable
           toolchain: 1.78.0
           targets: ${{ matrix.settings.target }}
       - name: Cache cargo
