@@ -29,6 +29,7 @@ jobs:
         settings:
           # x86 macos: https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources
           - host: macos-12
+            name: build_darwin_x86_64_cpu
             target: x86_64-apple-darwin
             build: |
               uname -a
@@ -37,19 +38,25 @@ jobs:
           # fix: C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\include\crt/host_config.h(153): fatal error C1189: #error:  -- unsupported Microsoft Visual Studio version! Only the versions between 2017 and 2022 (inclusive) are supported!
           # ref: https://github.com/ggerganov/whisper.cpp/commit/c55964c956d02fc7449b3d928d9a8e093cd475c3
           - host: windows-2019
+            name: build_windows_x86_64_cuda
             build: yarn build --features cuda
             target: x86_64-pc-windows-msvc
             # fixme: CMake Error at C:/Program Files/CMake/share/cmake-3.30/Modules/CMakeDetermineCompilerId.cmake:587 (message):
             # No CUDA toolset found.
             # cuda-toolkit: '11.3.0'
             cuda-toolkit: '11.8.0'
+          - host: windows
+            name: build_windows_x86_64_cpu
+            build: yarn build
+            target: x86_64-pc-windows-msvc
           - host: macos-14
+            name: build_darwin_arm64_metal
             target: aarch64-apple-darwin
             build: |
               uname -a
               sw_vers
               yarn build --features metal
-    name: stable - ${{ matrix.settings.target }} - node@18
+    name: stable - ${{ matrix.settings.name }} - node@18
     runs-on: ${{ matrix.settings.host }}
     steps:
       - uses: actions/checkout@v4
@@ -76,7 +83,7 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Install CUDA Toolkit on Windows
-        if: ${{ matrix.settings.target == 'x86_64-pc-windows-msvc' }}
+        if: ${{ matrix.settings.cuda-toolkit != '' && matrix.settings.cuda-toolkit != null }}
         id: cuda-toolkit
         uses: Jimver/cuda-toolkit@v0.2.16
         with:
@@ -133,11 +140,15 @@ jobs:
         run: ${{ matrix.settings.build }}
         if: ${{ !matrix.settings.docker }}
         shell: bash
+      - name: Rename node addon on Windows for CUDA and ROCm
+        if: ${{ matrix.settings.cuda-toolkit != '' && matrix.settings.cuda-toolkit != null }}
+        run: mv hear-core.win32-x64-msvc.node hear-core.win32-x64-msvc.nodev
+        shell: bash
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: bindings-${{ matrix.settings.target }}
-          path: ${{ env.APP_NAME }}/${{ env.APP_NAME }}.*.node
+          path: ${{ env.APP_NAME }}/${{ env.APP_NAME }}.*.node*
           if-no-files-found: error
   publish:
     defaults:
