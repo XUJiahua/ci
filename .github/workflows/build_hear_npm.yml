@@ -29,7 +29,7 @@ jobs:
         settings:
           # x86 macos: https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources
           - host: macos-12
-            name: build_darwin_x86_64_cpu
+            name: darwin_x86_64_cpu
             target: x86_64-apple-darwin
             build: |
               uname -a
@@ -38,7 +38,7 @@ jobs:
           # fix: C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\include\crt/host_config.h(153): fatal error C1189: #error:  -- unsupported Microsoft Visual Studio version! Only the versions between 2017 and 2022 (inclusive) are supported!
           # ref: https://github.com/ggerganov/whisper.cpp/commit/c55964c956d02fc7449b3d928d9a8e093cd475c3
           - host: windows-2019
-            name: build_windows_x86_64_cuda
+            name: windows_x86_64_cuda
             build: yarn build --features cuda
             target: x86_64-pc-windows-msvc
             # fixme: CMake Error at C:/Program Files/CMake/share/cmake-3.30/Modules/CMakeDetermineCompilerId.cmake:587 (message):
@@ -46,11 +46,11 @@ jobs:
             # cuda-toolkit: '11.3.0'
             cuda-toolkit: '11.8.0'
           - host: windows
-            name: build_windows_x86_64_cpu
+            name: windows_x86_64_cpu
             build: yarn build
             target: x86_64-pc-windows-msvc
           - host: macos-14
-            name: build_darwin_arm64_metal
+            name: darwin_arm64_metal
             target: aarch64-apple-darwin
             build: |
               uname -a
@@ -147,7 +147,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: bindings-${{ matrix.settings.target }}
+          name: bindings-${{ matrix.settings.name }}
           path: ${{ env.APP_NAME }}/${{ env.APP_NAME }}.*.node*
           if-no-files-found: error
   publish:
