@@ -21,3 +21,20 @@ jobs:
       - name: Example step using tag
         if: ${{ github.event.client_payload.tag_name != '' }}
         run: echo "Processing tag ${{ github.event.client_payload.tag_name }}"
+
+      - name: Checkout code from triggering repository
+        if: ${{ github.event.client_payload.triggering_repo != '' && github.event.client_payload.tag_name != '' }}
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.client_payload.triggering_repo }}
+          ref: ${{ github.event.client_payload.tag_name }}
+      - name: Login to Container Registry
+        if: ${{ github.event.client_payload.tag_name != '' }}
+        run: |
+          echo "${{ secrets.ACR_PASSWORD }}" | docker login --username "${{ secrets.ACR_USERNAME }}" --password-stdin crpi-jxberuq6v6y3whx7.cn-hongkong.personal.cr.aliyuncs.com
+
+      - name: Build and push Docker image
+        if: ${{ github.event.client_payload.tag_name != '' }}
+        run: |
+          make docker_build
+          make docker_push
