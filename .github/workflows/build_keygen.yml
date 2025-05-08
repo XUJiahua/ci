@@ -28,6 +28,7 @@ jobs:
         with:
           repository: ${{ github.event.client_payload.triggering_repo }}
           ref: ${{ github.event.client_payload.tag_name }}
+          token: ${{ secrets.GH_PAT }}
       - name: Login to Container Registry
         if: ${{ github.event.client_payload.tag_name != '' }}
         run: |
