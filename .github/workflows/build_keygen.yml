@@ -1,0 +1,23 @@
+name: build_keygen
+
+on:
+  repository_dispatch:
+    types: [keygen-tag-created]
+
+jobs:
+  process-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Print received tag information
+        run: |
+          echo "Workflow in Repository B triggered by a tag in Repository A."
+          echo "Tag Name: ${{ github.event.client_payload.tag_name }}"
+          echo "Commit SHA: ${{ github.event.client_payload.sha }}"
+          echo "Triggering Repository: ${{ github.event.client_payload.triggering_repo }}"
+
+      - name: Example step using tag
+        if: ${{ github.event.client_payload.tag_name != '' }}
+        run: echo "Processing tag ${{ github.event.client_payload.tag_name }}"
