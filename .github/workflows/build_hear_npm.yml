@@ -92,8 +92,9 @@ jobs:
         if: ${{ !matrix.settings.docker }}
         with:
           # 1.80.0 has issue with time-rs
-          toolchain: stable
-          # toolchain: 1.78.0
+          # 1.87.0 has issue with traitobject-0.1.0
+          # toolchain: stable
+          toolchain: 1.86.0
           targets: ${{ matrix.settings.target }}
       - name: Cache cargo
         uses: actions/cache@v4
